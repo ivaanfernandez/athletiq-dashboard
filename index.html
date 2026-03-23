@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AthletIQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #10367D;
+    --navy-dark: #0C285E;
+    --navy-light: #1A4499;
+    --gray: #EBEBEB;
+    --gray-dark: #D0D0D0;
+    --sky: #7BB8D4;
+    --sky-light: #B8D9EC;
+    --white: #FFFFFF;
+    --text-muted: #8A9CC2;
+    --accent: #E8F0FF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: auto; }
+  body { font-family: "Barlow", sans-serif; background: var(--gray); color: var(--navy); min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: var(--navy);
+    padding: 0 16px;
+    display: flex; align-items: center; justify-content: center;
+    height: 54px;
+  }
+  .header-logo { height: 28px; width: auto; }
+
+  /* HERO */
+  .hero { background: var(--navy); padding: 20px 16px 0; overflow: hidden; position: relative; }
+  .hero::before {
+    content: ""; position: absolute; right: -40px; top: -60px;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: var(--navy-light); opacity: 0.3; pointer-events: none;
+  }
+  .hero-inner { position: relative; z-index: 1; text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .phase-label {
+    font-family: "Barlow Condensed", sans-serif; font-size: 14px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--sky); margin-bottom: 4px;
+  }
+  .hero h1 {
+    font-family: "Barlow Condensed", sans-serif; font-size: 30px; font-weight: 900;
+    color: var(--white); text-transform: uppercase; line-height: 1.05; margin-bottom: 12px;
+  }
+  .hero-pills { display: flex; flex-wrap: wrap; gap: 7px; padding-bottom: 18px; justify-content: center; }
+  .pill {
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 100px; padding: 6px 12px;
+    font-size: 12px; font-weight: 500; color: var(--white);
+  }
+  .pill .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sky); }
+
+  /* WEEK BAR */
+  .week-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; background: var(--navy-dark);
+  }
+  .week-bar-label {
+    font-family: "Barlow Condensed", sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted);
+  }
+  .week-dots { display: flex; gap: 5px; flex: 1; }
+  .wdot { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.15); cursor: pointer; }
+  .wdot.current { background: var(--white); }
+  .wdot.done { background: var(--sky); }
+  .week-num { font-family: "Barlow Condensed", sans-serif; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); }
+
+  /* ── TAB NAVIGATION using radio inputs ── */
+  .tab-radios { display: none; }
+
+  .tabs {
+    background: var(--navy-dark);
+    display: flex;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .tab-label {
+    flex: 1; text-align: center;
+    font-family: "Barlow Condensed", sans-serif; font-size: 15px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-muted); padding: 16px 4px;
+    border-bottom: 3px solid transparent;
+    cursor: pointer; display: block;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  #tab1:checked ~ .shell .tab-label[for="tab1"],
+  #tab2:checked ~ .shell .tab-label[for="tab2"],
+  #tab3:checked ~ .shell .tab-label[for="tab3"] {
+    color: var(--white);
+    border-bottom-color: var(--sky);
+  }
+
+  .page { display: none; padding: 14px 12px; }
+
+  #tab1:checked ~ .shell #page-1,
+  #tab2:checked ~ .shell #page-2,
+  #tab3:checked ~ .shell #page-3 { display: block; }
+
+  /* CARDS */
+  .info-card { background: var(--white); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+  .info-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .step-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Barlow Condensed", sans-serif; font-weight: 800; font-size: 13px;
+    background: var(--navy); color: var(--white); flex-shrink: 0;
+  }
+  .step-num.sky { background: var(--sky); color: var(--navy); }
+  .step-num.outline { background: transparent; border: 2px solid var(--navy); color: var(--navy); }
+  .card-title {
+    font-family: "Barlow Condensed", sans-serif; font-size: 16px; font-weight: 800;
+    text-transform: uppercase; color: var(--navy);
+  }
+  .highlight-box {
+    background: var(--accent); border-left: 3px solid var(--navy);
+    border-radius: 0 8px 8px 0; padding: 10px 12px;
+    font-size: 13px; color: var(--navy); line-height: 1.55; margin-bottom: 10px;
+  }
+  .body-text { font-size: 13px; color: #444; line-height: 1.6; }
+  .cal-row { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 7px; font-size: 13px; color: #444; }
+  .cal-ico {
+    width: 20px; height: 20px; border-radius: 50%; background: var(--sky-light);
+    display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0;
+  }
+  .priority-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip {
+    background: var(--gray); border-radius: 6px; padding: 4px 10px;
+    font-size: 11px; font-weight: 600; color: var(--navy);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .chip .n {
+    width: 14px; height: 14px; background: var(--navy); color: var(--white);
+    border-radius: 50%; font-size: 9px; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* EXERCISES */
+  .section-label {
+    font-family: "Barlow Condensed", sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--navy); opacity: 0.5; margin: 14px 0 6px 2px;
+  }
+  .superset-group { margin-bottom: 10px; }
+  .superset-tag {
+    font-family: "Barlow Condensed", sans-serif; font-size: 9px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    background: var(--sky-light); color: var(--navy);
+    padding: 3px 10px; border-radius: 4px 4px 0 0; display: inline-block;
+    margin-bottom: -1px; margin-left: 2px;
+  }
+  .ex-card {
+    background: var(--white); border-radius: 0 10px 10px 10px;
+    padding: 12px 14px; margin-bottom: 2px;
+    display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: start;
+  }
+  .ex-card + .ex-card { border-radius: 10px; margin-top: 2px; }
+  .ex-order { font-family: "Barlow Condensed", sans-serif; font-size: 20px; font-weight: 900; color: var(--navy); line-height: 1; }
+  .ex-name { font-family: "Barlow Condensed", sans-serif; font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 2px; }
+  .ex-badge {
+    display: inline-block; padding: 1px 7px; border-radius: 4px;
+    font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;
+  }
+  .b-iso { background: #E0EAF8; color: var(--navy); }
+  .b-fuerza { background: #FFF0E0; color: #C05A00; }
+  .b-acc { background: #E8F5E9; color: #2E7D32; }
+  .ex-meta { display: flex; gap: 6px; align-items: center; margin-top: 2px; flex-wrap: wrap; }
+  .meta-tag {
+    background: var(--gray); border-radius: 5px; padding: 3px 8px;
+    font-family: "Barlow Condensed", sans-serif; font-size: 12px; font-weight: 700; color: var(--navy-light);
+  }
+  .ex-note { font-size: 11px; color: #888; line-height: 1.45; margin-top: 4px; }
+  .ex-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; padding-top: 2px; }
+  .sets-badge { font-family: "Barlow Condensed", sans-serif; font-size: 22px; font-weight: 900; color: var(--navy); line-height: 1; }
+  .sets-label { font-size: 9px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; text-align: right; }
+  .peso-input {
+    width: 62px; border: 2px solid var(--gray-dark); border-radius: 8px;
+    padding: 8px 6px; font-family: "Barlow Condensed", sans-serif;
+    font-size: 16px; font-weight: 700; color: var(--navy);
+    background: var(--gray); text-align: center; outline: none;
+  }
+  .peso-input:focus { border-color: var(--navy); background: var(--white); }
+  .peso-input::placeholder { color: #ccc; font-size: 10px; font-weight: 400; }
+  .ex-section-divider {
+    background: rgba(16,54,125,0.07); border-radius: 8px; padding: 7px 14px;
+    margin: 12px 0 6px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .ex-section-divider span { font-family: "Barlow Condensed", sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--navy); }
+  .pct-tag { font-size: 11px; font-weight: 800; color: #C05A00; }
+
+  .session-progress {
+    background: var(--white); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .prog-label { font-size: 12px; color: #777; flex-shrink: 0; }
+  .prog-track { flex: 1; height: 6px; background: var(--gray); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--sky); border-radius: 3px; transition: width 0.3s; width: 0%; }
+  .prog-pct { font-family: "Barlow Condensed", sans-serif; font-size: 14px; font-weight: 800; color: var(--navy); flex-shrink: 0; }
+
+  .save-wrap { padding: 8px 0 24px; }
+  .save-btn {
+    width: 100%; background: var(--navy); color: var(--white); border: none;
+    border-radius: 12px; padding: 16px;
+    font-family: "Barlow Condensed", sans-serif; font-size: 16px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+  }
+  .save-btn:active { opacity: 0.8; }
+</style>
+</head>
+<body>
+
+<!-- Radio inputs control which tab is active -->
+<input type="radio" name="tabs" id="tab1" class="tab-radios" checked>
+<input type="radio" name="tabs" id="tab2" class="tab-radios">
+<input type="radio" name="tabs" id="tab3" class="tab-radios">
+
+<div class="shell">
+
+  <header>
+    <img src="data:image/png;base64,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" class="header-logo" alt="AthletIQ">
+  </header>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="phase-label">Iván Fernández</div>
+      <h1>Programación de<br>Fuerza General</h1>
+      <div class="hero-pills">
+        <div class="pill"><span class="dot"></span>5 Semanas</div>
+        <div class="pill"><span class="dot"></span>Fuerza Sub-Máxima</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="week-bar">
+    <span class="week-bar-label">Semana</span>
+    <div class="week-dots">
+      <div class="wdot current" id="w1" onclick="setWeek(1)"></div>
+      <div class="wdot" id="w2" onclick="setWeek(2)"></div>
+      <div class="wdot" id="w3" onclick="setWeek(3)"></div>
+      <div class="wdot" id="w4" onclick="setWeek(4)"></div>
+      <div class="wdot" id="w5" onclick="setWeek(5)"></div>
+    </div>
+    <span class="week-num" id="week-label">1 / 5</span>
+  </div>
+
+  <div class="tabs">
+    <label class="tab-label" for="tab1">Día 1</label>
+    <label class="tab-label" for="tab2">Día 2</label>
+    <label class="tab-label" for="tab3">Día 3</label>
+  </div>
+
+  <!-- DÍA 1 -->
+  <div class="page" id="page-1">
+<div class="session-progress">
+    <span class="prog-label">Sesión</span>
+    <div class="prog-track"><div class="prog-fill" id="prog-1"></div></div>
+    <span class="prog-pct" id="pct-1">0%</span>
+  </div>
+
+  <!-- Calentamiento -->
+  <div class="info-card">
+    <div class="info-card-header">
+      <div class="step-num sky">1</div>
+      <span class="card-title">Calentamiento</span>
+    </div>
+    <div class="highlight-box">🎯 <strong>Reto de movilidad:</strong> 2 ejercicios (1 upper + 1 piernas) al inicio o final.</div>
+    <div class="cal-row"><div class="cal-ico">🏃</div><span>5 min en cardio (treadmill, rower o bici)</span></div>
+    <div class="cal-row"><div class="cal-ico">💪</div><span>1-2 sets bodyweight de los ejercicios isométricos</span></div>
+  </div>
+
+  <!-- Entrenamiento -->
+  <div class="info-card">
+    <div class="info-card-header">
+      <div class="step-num outline">2</div>
+      <span class="card-title">Entrenamiento</span>
+    </div>
+    <div class="highlight-box">Si usas los isométricos para calentar, debe ser <strong>bodyweight</strong>. El primer set de trabajo comienza aguantando peso. Anota el peso de <strong>mayor resistencia</strong> durante los sets.</div>
+    <div class="body-text" style="margin-bottom:8px;">De ser necesario, puedes hacer un set a <strong>55-70%</strong> antes de comenzar los sets de trabajo.</div>
+    <div class="priority-chips">
+      <div class="chip"><span class="n">1</span> Técnica</div>
+      <div class="chip"><span class="n">2</span> 80-85% esfuerzo máx.</div>
+      <div class="chip"><span class="n">3</span> Controlar el peso</div>
+    </div>
+  </div>
+
+  <!-- Exercises -->
+  <div class="section-label">Isométricos</div>
+
+  <div class="superset-group">
+    <span class="superset-tag">▸ Super Set 1</span>
+    <div class="ex-card">
+      <div class="ex-order">1A</div>
+      <div class="ex-body">
+        <div class="ex-name">Bulgarian Split Squat ISO</div>
+        <span class="ex-badge b-iso">Isométrico</span>
+        <div class="ex-meta">
+          <span class="meta-tag">3 sets</span>
+          <span class="meta-tag">30 seg c/u</span>
+        </div>
+        <div class="ex-note">Todo el peso en la pierna delantera. El tiempo comienza al elevar el talón.</div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(1)">
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-order">1B</div>
+      <div class="ex-body">
+        <div class="ex-name">Push Up ISO</div>
+        <span class="ex-badge b-iso">Isométrico</span>
+        <div class="ex-meta">
+          <span class="meta-tag">3 sets</span>
+          <span class="meta-tag">30 seg</span>
+        </div>
+        <div class="ex-note">Empujar hacia abajo y pegar puños simultáneamente.</div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="text" placeholder="BW" oninput="updateProg(1)">
+      </div>
+    </div>
+  </div>
+
+  <div class="superset-group">
+    <span class="superset-tag">▸ Super Set 2</span>
+    <div class="ex-card">
+      <div class="ex-order">2A</div>
+      <div class="ex-body">
+        <div class="ex-name">Leg Curl ISO</div>
+        <span class="ex-badge b-iso">Isométrico</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">30 seg c/u</span></div>
+        <div class="ex-note">Escápulas en banco, peso en talón sobre la caja. Hamstring flexionando rodilla. Torso horizontal.</div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(1)">
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-order">2B</div>
+      <div class="ex-body">
+        <div class="ex-name">Supine BB Row ISO</div>
+        <span class="ex-badge b-iso">Isométrico</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">30 seg</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="text" placeholder="BW" oninput="updateProg(1)">
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-section-divider">
+    <span>⚡ Fuerza Sub-Máxima</span>
+    <span class="pct-tag">80–85%</span>
+  </div>
+
+  <div class="superset-group">
+    <span class="superset-tag">▸ Super Set 3</span>
+    <div class="ex-card">
+      <div class="ex-order">3A</div>
+      <div class="ex-body">
+        <div class="ex-name">DB Bench Press</div>
+        <span class="ex-badge b-fuerza">Fuerza</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">6 reps</span></div>
+        <div class="ex-note">Tempo regular subida. 2-3 seg bajando.</div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(1)">
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-order">3B</div>
+      <div class="ex-body">
+        <div class="ex-name">Smith Machine Deep Squat</div>
+        <span class="ex-badge b-fuerza">Fuerza</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">6 reps</span></div>
+        <div class="ex-note">Platos bajo talones. Rodillas afuera. 2-3 seg bajando, 1 seg pausa en el fondo.</div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(1)">
+      </div>
+    </div>
+  </div>
+
+  <div class="superset-group">
+    <span class="superset-tag">▸ Super Set 4</span>
+    <div class="ex-card">
+      <div class="ex-order">4A</div>
+      <div class="ex-body">
+        <div class="ex-name">SA Cable Row</div>
+        <span class="ex-badge b-fuerza">Fuerza</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">6 reps</span></div>
+        <div class="ex-note">Tirar codo atrás. 2-3 seg hacia al frente.</div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(1)">
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-order">4B</div>
+      <div class="ex-body">
+        <div class="ex-name">SL Cable RDL</div>
+        <span class="ex-badge b-fuerza">Fuerza</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">6 reps</span></div>
+        <div class="ex-note">Cable o leg curl. 2-3 seg extendiendo la rodilla.</div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(1)">
+      </div>
+    </div>
+  </div>
+
+  <div class="save-wrap">
+    <button class="save-btn" onclick="saveDay(1)">Guardar Día 1 →</button>
+  </div>
+  </div>
+
+  <!-- DÍA 2 -->
+  <div class="page" id="page-2">
+<div class="session-progress">
+    <span class="prog-label">Sesión</span>
+    <div class="prog-track"><div class="prog-fill" id="prog-2"></div></div>
+    <span class="prog-pct" id="pct-2">0%</span>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-header">
+      <div class="step-num sky">1</div>
+      <span class="card-title">Calentamiento</span>
+    </div>
+    <div class="highlight-box">🎯 <strong>Reto de movilidad:</strong> 2 ejercicios (1 upper + 1 piernas) al inicio o final.</div>
+    <div class="cal-row"><div class="cal-ico">🏃</div><span>5 min en cardio (treadmill, rower o bici)</span></div>
+    <div class="cal-row"><div class="cal-ico">💪</div><span>1-2 sets bodyweight de los ejercicios isométricos</span></div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-header">
+      <div class="step-num outline">2</div>
+      <span class="card-title">Entrenamiento</span>
+    </div>
+    <div class="body-text">Isométricos 3x30s cada lado. Fuerza General: <strong>1x8 / 2x6</strong> — 1er set 70%, 2do y 3er set 85-90%.</div>
+  </div>
+
+  <div class="section-label">Isométricos — 3x30s c/lado</div>
+
+  <div class="superset-group">
+    <span class="superset-tag">▸ Super Set 1</span>
+    <div class="ex-card">
+      <div class="ex-order">1A</div>
+      <div class="ex-body">
+        <div class="ex-name">Copenhagen Side Plank</div>
+        <span class="ex-badge b-iso">Isométrico</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">30 seg c/u</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="text" placeholder="BW" oninput="updateProg(2)">
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-order">1B</div>
+      <div class="ex-body">
+        <div class="ex-name">Kneeling Cable Pallof Press</div>
+        <span class="ex-badge b-iso">Isométrico</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">30 seg c/u</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(2)">
+      </div>
+    </div>
+  </div>
+
+  <div class="superset-group">
+    <span class="superset-tag">▸ Super Set 2</span>
+    <div class="ex-card">
+      <div class="ex-order">2A</div>
+      <div class="ex-body">
+        <div class="ex-name">Reverse Copenhagen Side Plank</div>
+        <span class="ex-badge b-iso">Isométrico</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">30 seg c/u</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="text" placeholder="BW" oninput="updateProg(2)">
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-order">2B</div>
+      <div class="ex-body">
+        <div class="ex-name">KB / DB Marches</div>
+        <span class="ex-badge b-iso">Isométrico</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">30 seg</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(2)">
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-section-divider">
+    <span>⚡ Fuerza General</span>
+    <span class="pct-tag">70% → 85-90%</span>
+  </div>
+
+  <div class="superset-group">
+    <span class="superset-tag">▸ Super Set 3</span>
+    <div class="ex-card">
+      <div class="ex-order">3A</div>
+      <div class="ex-body">
+        <div class="ex-name">Dumbbell Overhead Press</div>
+        <span class="ex-badge b-fuerza">Fuerza</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">1x8 / 2x6</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(2)">
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-order">3B</div>
+      <div class="ex-body">
+        <div class="ex-name">Trap Bar Deadlift</div>
+        <span class="ex-badge b-fuerza">Fuerza</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">1x8 / 2x6</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(2)">
+      </div>
+    </div>
+  </div>
+
+  <div class="superset-group">
+    <span class="superset-tag">▸ Super Set 4</span>
+    <div class="ex-card">
+      <div class="ex-order">4A</div>
+      <div class="ex-body">
+        <div class="ex-name">Wide Grip Pull Ups (negativos)</div>
+        <span class="ex-badge b-fuerza">Fuerza</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">1x8 / 2x6</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="text" placeholder="BW" oninput="updateProg(2)">
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-order">4B</div>
+      <div class="ex-body">
+        <div class="ex-name">Smith Machine Calf Raise</div>
+        <span class="ex-badge b-fuerza">Fuerza</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">1x8 / 2x6</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(2)">
+      </div>
+    </div>
+  </div>
+
+  <div class="save-wrap">
+    <button class="save-btn" onclick="saveDay(2)">Guardar Día 2 →</button>
+  </div>
+  </div>
+
+  <!-- DÍA 3 -->
+  <div class="page" id="page-3">
+<div class="session-progress">
+    <span class="prog-label">Sesión</span>
+    <div class="prog-track"><div class="prog-fill" id="prog-3"></div></div>
+    <span class="prog-pct" id="pct-3">0%</span>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-header">
+      <div class="step-num sky">1</div>
+      <span class="card-title">Calentamiento</span>
+    </div>
+    <div class="highlight-box">🎯 <strong>Reto de movilidad:</strong> 2 ejercicios (1 upper + 1 piernas) al inicio o final.</div>
+    <div class="cal-row"><div class="cal-ico">🏃</div><span>5 min en cardio (treadmill, rower o bici)</span></div>
+    <div class="cal-row"><div class="cal-ico">💪</div><span>1-2 sets bodyweight de los ejercicios isométricos</span></div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-header">
+      <div class="step-num outline">2</div>
+      <span class="card-title">Entrenamiento</span>
+    </div>
+    <div class="body-text">Isométricos 3x30s. Fuerza: <strong>3x6 / 2x6</strong>. Accesorios: <strong>3x12</strong>.</div>
+  </div>
+
+  <div class="section-label">Isométricos → Fuerza</div>
+
+  <div class="superset-group">
+    <span class="superset-tag">▸ Super Set 1</span>
+    <div class="ex-card">
+      <div class="ex-order">1A</div>
+      <div class="ex-body">
+        <div class="ex-name">Bulgarian SS ISO → DB Bench Press</div>
+        <span class="ex-badge b-iso">ISO → Fuerza</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">30s / 3x6</span></div>
+        <div class="ex-note">ISO: todo el peso en pierna delantera. Luego transicionar a DB Bench Press.</div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(3)">
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-order">1B</div>
+      <div class="ex-body">
+        <div class="ex-name">Push Up ISO → DB Bench Press</div>
+        <span class="ex-badge b-iso">ISO → Fuerza</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">30s / 2x6</span></div>
+        <div class="ex-note">ISO: empujar hacia abajo y pegar puños. Luego DB Bench Press.</div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="text" placeholder="BW/lbs" oninput="updateProg(3)">
+      </div>
+    </div>
+  </div>
+
+  <div class="superset-group">
+    <span class="superset-tag">▸ Super Set 2</span>
+    <div class="ex-card">
+      <div class="ex-order">2A</div>
+      <div class="ex-body">
+        <div class="ex-name">SL Leg Curl ISO → Cable Leg Curl</div>
+        <span class="ex-badge b-iso">ISO → Fuerza</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">30s / 3x6</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(3)">
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-order">2B</div>
+      <div class="ex-body">
+        <div class="ex-name">DB Row ISO → Cable Row</div>
+        <span class="ex-badge b-iso">ISO → Fuerza</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">30s / 2x6</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(3)">
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-section-divider">
+    <span>💪 Accesorios</span>
+    <span class="pct-tag">3x12</span>
+  </div>
+
+  <div class="superset-group">
+    <span class="superset-tag">▸ Super Set 3</span>
+    <div class="ex-card">
+      <div class="ex-order">3A</div>
+      <div class="ex-body">
+        <div class="ex-name">Bicep Curl</div>
+        <span class="ex-badge b-acc">Accesorio</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">12 reps</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(3)">
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-order">3B</div>
+      <div class="ex-body">
+        <div class="ex-name">Lat Raise</div>
+        <span class="ex-badge b-acc">Accesorio</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">12 reps</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(3)">
+      </div>
+    </div>
+  </div>
+
+  <div class="superset-group">
+    <span class="superset-tag">▸ Super Set 4</span>
+    <div class="ex-card">
+      <div class="ex-order">4A</div>
+      <div class="ex-body">
+        <div class="ex-name">Tricep Ext.</div>
+        <span class="ex-badge b-acc">Accesorio</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">12 reps</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(3)">
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-order">4B</div>
+      <div class="ex-body">
+        <div class="ex-name">Front Raise</div>
+        <span class="ex-badge b-acc">Accesorio</span>
+        <div class="ex-meta"><span class="meta-tag">3 sets</span><span class="meta-tag">12 reps</span></div>
+      </div>
+      <div class="ex-right">
+        <div><div class="sets-badge">3</div><div class="sets-label">sets</div></div>
+        <input class="peso-input" type="number" placeholder="lbs" oninput="updateProg(3)">
+      </div>
+    </div>
+  </div>
+
+  <div class="save-wrap">
+    <button class="save-btn" onclick="saveDay(3)">Guardar Día 3 →</button>
+  </div>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+  function updateProg(day) {
+    var page = document.getElementById("page-"+day);
+    var inputs = page.querySelectorAll(".peso-input");
+    var filled = 0;
+    for (var i = 0; i < inputs.length; i++) {
+      if (inputs[i].value.trim() !== "") filled++;
+    }
+    var pct = inputs.length ? Math.round(filled/inputs.length*100) : 0;
+    document.getElementById("prog-"+day).style.width = pct+"%";
+    document.getElementById("pct-"+day).textContent = pct+"%";
+  }
+
+  function saveDay(day) {
+    var page = document.getElementById("page-"+day);
+    var cards = page.querySelectorAll(".ex-card");
+    var result = [];
+    for (var i = 0; i < cards.length; i++) {
+      var order = cards[i].querySelector(".ex-order");
+      var name = cards[i].querySelector(".ex-name");
+      var input = cards[i].querySelector(".peso-input");
+      if (order && name && input) {
+        result.push(order.textContent+") "+name.textContent+": "+(input.value||"—")+" lbs");
+      }
+    }
+    alert("Día "+day+" guardado!
+
+"+result.join("
+"));
+  }
+
+  function setWeek(n) {
+    for (var i = 1; i <= 5; i++) {
+      var el = document.getElementById("w"+i);
+      el.className = "wdot";
+      if (i < n) el.className = "wdot done";
+      if (i === n) el.className = "wdot current";
+    }
+    document.getElementById("week-label").textContent = n+" / 5";
+  }
+</script>
+</body>
+</html>
